@@ -20,13 +20,11 @@ func (s *Service) metrics(w http.ResponseWriter, r *http.Request) {
 	service := vars["service"]
 
 	query := r.URL.Query()
-	fmt.Println("port", query.Get("port"))
-	fmt.Println("path", query.Get("path"))
-
 	port := query.Get("port")
 	_, err := strconv.Atoi(port)
 	if err != nil {
-		http.Error(w, "invalid port", 400)
+		http.Error(w, fmt.Sprint("invalid port", query.Get("port"), query.Get("path"), "err:", err.Error(), "query:", query), 400)
+		// http.Error(w, "invalid port", 400)
 		return
 	}
 
