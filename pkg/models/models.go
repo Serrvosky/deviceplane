@@ -190,12 +190,35 @@ type DeviceApplicationStatus struct {
 }
 
 type DeviceServiceStatus struct {
-	ProjectID        string `json:"projectId" yaml:"projectId"`
-	DeviceID         string `json:"deviceId" yaml:"deviceId"`
-	ApplicationID    string `json:"applicationId" yaml:"applicationId"`
-	Service          string `json:"service" yaml:"service"`
-	CurrentReleaseID string `json:"currentReleaseId" yaml:"currentReleaseId"`
+	ProjectID        string         `json:"projectId" yaml:"projectId"`
+	DeviceID         string         `json:"deviceId" yaml:"deviceId"`
+	ApplicationID    string         `json:"applicationId" yaml:"applicationId"`
+	Service          string         `json:"service" yaml:"service"`
+	CurrentReleaseID string         `json:"currentReleaseId" yaml:"currentReleaseId"`
+	ContainerState   ContainerState `json:"containerState" yaml:"containerState"`
 }
+
+type ContainerState struct {
+	ContainerStatus ContainerStatus `json:"containerStatus" yaml:"containerStatus"`
+	ErrorMessage    string          `json:"errorMessage,omitempty" yaml:"errorMessage"`
+	InfoMessage     string          `json:"infoMessage,omitempty" yaml:"infoMessage"`
+}
+
+type ContainerStatus string
+
+const (
+	ContainerDownloadingImage ContainerStatus = "Downloading"
+	ContainerUnknownStatus    ContainerStatus = "Unknown"
+
+	// Defined by the Docker API
+	ContainerCreated    ContainerStatus = "Created"
+	ContainerRestarting ContainerStatus = "Restarting"
+	ContainerRunning    ContainerStatus = "Running"
+	ContainerRemoving   ContainerStatus = "Removing"
+	ContainerPaused     ContainerStatus = "Paused"
+	ContainerExited     ContainerStatus = "Exited"
+	ContainerDead       ContainerStatus = "Dead"
+)
 
 type MembershipFull1 struct {
 	Membership

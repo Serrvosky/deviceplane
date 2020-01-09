@@ -264,16 +264,42 @@ func (s *ServiceSupervisor) keepAlive() {
 				continue
 			}
 
-			// TODO: filter down to just one instance if we find more
 			instance := instances[0]
 
-			if !instance.Running {
+			// filter down to just one instance if we find more
+			for _, excessInstance := range instances[1:] {
+				go func(id string) {
+					utils.ContainerStop(s.ctx, s.engine, id)
+					utils.ContainerRemove(s.ctx, s.engine, id)
+				}(excessInstance.ID)
+			}
+
+			if instance.Status != models.ContainerRunning {
 				if err = utils.ContainerStart(s.ctx, s.engine, instance.ID); err != nil {
 					continue
 				}
 			}
 
-			s.reporter.SetServiceRelease(s.serviceName, release)
+			var errorMessage string
+			if instance.Status == models.ContainerExited {
+				str, err := s.engine.GetContainerStderr(s.ctx, instance.ID)
+				if err != nil {
+					// TODO: remove this for this PR
+					// standard_init_linux.go:211: exec user process caused "exec format error"
+					// standard_init_linux.go:207: exec user process caused "exec format error"
+					if strings.Contains(*str, `exec user process caused "exec format error"`) {
+						errorMessage = "Container could be compiled for the wrong source"
+					}
+				}
+			}
+
+			s.reporter.SetServiceStatus(s.serviceName, &models.SetDeviceServiceStatusRequest{
+				CurrentReleaseID: release,
+				ContainerState: models.ContainerState{
+					ContainerStatus: instance.Status,
+					ErrorMessage:    errorMessage,
+				},
+			})
 			s.containerID.Store(instance.ID)
 		}
 	}

@@ -20,13 +20,15 @@ type Engine interface {
 	StopContainer(context.Context, string) error
 	RemoveContainer(context.Context, string) error
 
+	GetContainerStderr(ctx context.Context, id string) (*string, error)
+
 	PullImage(context.Context, string, string, io.Writer) error
 }
 
 type Instance struct {
-	ID      string
-	Labels  map[string]string
-	Running bool
+	ID     string
+	Labels map[string]string
+	Status models.ContainerStatus
 }
 
 type InspectResponse struct {

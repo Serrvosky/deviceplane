@@ -740,28 +740,30 @@ const setDeviceServiceStatus = `
     device_id,
     application_id,
     service,
-    current_release_id
+    current_release_id,
+    container_state
   )
-  values (?, ?, ?, ?, ?)
+  values (?, ?, ?, ?, ?, ?)
   on duplicate key update
     current_release_id = ?
+    container_state = ?
 `
 
 // Index: primary key
 const getDeviceServiceStatus = `
-  select project_id, device_id, application_id, service, current_release_id from device_service_statuses
+  select project_id, device_id, application_id, service, current_release_id, container_state from device_service_statuses
   where project_id = ? and device_id = ? and application_id = ? and service = ?
 `
 
 // Index: project_id_device_id_application_id
 const getDeviceServiceStatuses = `
-  select project_id, device_id, application_id, service, current_release_id from device_service_statuses
+  select project_id, device_id, application_id, service, current_release_id, container_state from device_service_statuses
   where project_id = ? and device_id = ? and application_id = ?
 `
 
 // Index: project_id_device_id_application_id
 const listDeviceServiceStatuses = `
-  select project_id, device_id, application_id, service, current_release_id from device_service_statuses
+  select project_id, device_id, application_id, service, current_release_id, container_state from device_service_statuses
   where project_id = ? and device_id = ?
 `
 

@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"strings"
 
 	"github.com/deviceplane/deviceplane/pkg/engine"
@@ -54,6 +55,30 @@ func (e *Engine) InspectContainer(ctx context.Context, id string) (*engine.Inspe
 	return &engine.InspectResponse{
 		PID: container.State.Pid,
 	}, nil
+}
+
+// TODO: remove this for this PR
+func (e *Engine) GetContainerStderr(ctx context.Context, id string) (*string, error) {
+	rc, err := e.client.ContainerLogs(ctx, id, types.ContainerLogsOptions{
+		ShowStdout: false,
+		ShowStderr: true,
+		Since:      "1m",
+		Tail:       "10",
+		Follow:     false,
+		Details:    false,
+	})
+	if err != nil {
+		return nil, errors.WithMessage(err, "could not get container logs")
+	}
+
+	defer rc.Close()
+	buf, err := ioutil.ReadAll(rc)
+	if err != nil {
+		return nil, errors.WithMessage(err, "could not read from container logs buffer")
+	}
+
+	str := string(buf)
+	return &str, nil
 }
 
 func (e *Engine) StartContainer(ctx context.Context, id string) error {
