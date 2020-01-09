@@ -280,25 +280,9 @@ func (s *ServiceSupervisor) keepAlive() {
 				}
 			}
 
-			var errorMessage string
-			if instance.Status == models.ContainerExited {
-				str, err := s.engine.GetContainerStderr(s.ctx, instance.ID)
-				if err != nil {
-					// TODO: remove this for this PR
-					// standard_init_linux.go:211: exec user process caused "exec format error"
-					// standard_init_linux.go:207: exec user process caused "exec format error"
-					if strings.Contains(*str, `exec user process caused "exec format error"`) {
-						errorMessage = "Container could be compiled for the wrong source"
-					}
-				}
-			}
-
 			s.reporter.SetServiceStatus(s.serviceName, &models.SetDeviceServiceStatusRequest{
 				CurrentReleaseID: release,
-				ContainerState: models.ContainerState{
-					ContainerStatus: instance.Status,
-					ErrorMessage:    errorMessage,
-				},
+				ContainerStatus:  instance.Status,
 			})
 			s.containerID.Store(instance.ID)
 		}

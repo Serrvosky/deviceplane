@@ -423,7 +423,7 @@ create table if not exists device_service_statuses (
   service varchar(100) not null,
 
   current_release_id varchar(32) not null,
-  container_state longtext not null,
+  container_status longtext not null,
 
   primary key (project_id, device_id, application_id, service),
   foreign key device_service_statuses_project_id(project_id)

@@ -20,8 +20,6 @@ type Engine interface {
 	StopContainer(context.Context, string) error
 	RemoveContainer(context.Context, string) error
 
-	GetContainerStderr(ctx context.Context, id string) (*string, error)
-
 	PullImage(context.Context, string, string, io.Writer) error
 }
 

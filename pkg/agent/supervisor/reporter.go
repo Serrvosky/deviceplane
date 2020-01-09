@@ -12,7 +12,7 @@ import (
 type Reporter struct {
 	applicationID           string
 	reportApplicationStatus func(ctx context.Context, applicationID string, currentRelease string) error
-	reportServiceStatus     func(ctx context.Context, applicationID, service string, status *models.SetDeviceServiceStatusRequest) error
+	reportServiceStatus     func(ctx context.Context, applicationID, service string, currentReleaseID string, status models.ContainerStatus) error
 
 	desiredApplicationRelease      string
 	desiredApplicationServiceNames map[string]struct{}
@@ -32,7 +32,7 @@ type Reporter struct {
 func NewReporter(
 	applicationID string,
 	reportApplicationStatus func(ctx context.Context, applicationID, currentRelease string) error,
-	reportServiceStatus func(ctx context.Context, applicationID, service string, stauts *models.SetDeviceServiceStatusRequest) error,
+	reportServiceStatus func(ctx context.Context, applicationID, service string, currentReleaseID string, status models.ContainerStatus) error,
 ) *Reporter {
 	ctx, cancel := context.WithCancel(context.Background())
 	return &Reporter{
@@ -130,9 +130,7 @@ func (r *Reporter) serviceStatusReporter() {
 		for service, status := range r.serviceStatuses {
 			reportedStatus, ok := r.reportedServiceStatuses[service]
 			if !ok || (reportedStatus.CurrentReleaseID != status.CurrentReleaseID ||
-				reportedStatus.ContainerState.ContainerStatus != status.ContainerState.ContainerStatus ||
-				reportedStatus.ContainerState.ErrorMessage != status.ContainerState.ErrorMessage ||
-				reportedStatus.ContainerState.InfoMessage != status.ContainerState.InfoMessage) {
+				reportedStatus.ContainerStatus != status.ContainerStatus) {
 
 				diff[service] = status
 			}
@@ -141,7 +139,7 @@ func (r *Reporter) serviceStatusReporter() {
 		r.lock.RUnlock()
 
 		for serviceName, status := range diff {
-			if err := r.reportServiceStatus(r.ctx, r.applicationID, serviceName, status); err != nil {
+			if err := r.reportServiceStatus(r.ctx, r.applicationID, serviceName, status.CurrentReleaseID, status.ContainerStatus); err != nil {
 				log.WithError(err).Error("report service status")
 				goto cont
 			}

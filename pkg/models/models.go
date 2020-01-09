@@ -190,18 +190,12 @@ type DeviceApplicationStatus struct {
 }
 
 type DeviceServiceStatus struct {
-	ProjectID        string         `json:"projectId" yaml:"projectId"`
-	DeviceID         string         `json:"deviceId" yaml:"deviceId"`
-	ApplicationID    string         `json:"applicationId" yaml:"applicationId"`
-	Service          string         `json:"service" yaml:"service"`
-	CurrentReleaseID string         `json:"currentReleaseId" yaml:"currentReleaseId"`
-	ContainerState   ContainerState `json:"containerState" yaml:"containerState"`
-}
-
-type ContainerState struct {
-	ContainerStatus ContainerStatus `json:"containerStatus" yaml:"containerStatus"`
-	ErrorMessage    string          `json:"errorMessage,omitempty" yaml:"errorMessage"`
-	InfoMessage     string          `json:"infoMessage,omitempty" yaml:"infoMessage"`
+	ProjectID        string          `json:"projectId" yaml:"projectId"`
+	DeviceID         string          `json:"deviceId" yaml:"deviceId"`
+	ApplicationID    string          `json:"applicationId" yaml:"applicationId"`
+	Service          string          `json:"service" yaml:"service"`
+	CurrentReleaseID string          `json:"currentReleaseId" yaml:"currentReleaseId"`
+	ContainerStatus  ContainerStatus `json:"containerStatus" yaml:"containerStatus"`
 }
 
 type ContainerStatus string
