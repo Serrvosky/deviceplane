@@ -745,7 +745,7 @@ const setDeviceServiceStatus = `
   )
   values (?, ?, ?, ?, ?, ?)
   on duplicate key update
-    current_release_id = ?
+    current_release_id = ?,
     container_status = ?
 `
 
