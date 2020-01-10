@@ -2880,7 +2880,11 @@ func (s *Service) setDeviceServiceStatus(w http.ResponseWriter, r *http.Request,
 	}
 
 	if err := s.deviceServiceStatuses.SetDeviceServiceStatus(r.Context(), project.ID, device.ID,
-		applicationID, service, setDeviceServiceStatusRequest.CurrentReleaseID, setDeviceServiceStatusRequest.ContainerStatus,
+		applicationID,
+		service,
+		setDeviceServiceStatusRequest.CurrentReleaseID,
+		setDeviceServiceStatusRequest.ContainerStatus,
+		setDeviceServiceStatusRequest.ContainerError,
 	); err != nil {
 		log.WithError(err).Error("set device service status")
 		w.WriteHeader(http.StatusInternalServerError)
