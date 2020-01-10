@@ -12,7 +12,7 @@ import (
 type Reporter struct {
 	applicationID           string
 	reportApplicationStatus func(ctx context.Context, applicationID string, currentRelease string) error
-	reportServiceStatus     func(ctx context.Context, applicationID, service string, currentReleaseID string, status models.ContainerStatus) error
+	reportServiceStatus     func(ctx context.Context, applicationID, service string, currentReleaseID string, status models.ContainerStatus, containerError error) error
 
 	desiredApplicationRelease      string
 	desiredApplicationServiceNames map[string]struct{}
@@ -32,7 +32,7 @@ type Reporter struct {
 func NewReporter(
 	applicationID string,
 	reportApplicationStatus func(ctx context.Context, applicationID, currentRelease string) error,
-	reportServiceStatus func(ctx context.Context, applicationID, service string, currentReleaseID string, status models.ContainerStatus) error,
+	reportServiceStatus func(ctx context.Context, applicationID, service string, currentReleaseID string, status models.ContainerStatus, containerError error) error,
 ) *Reporter {
 	ctx, cancel := context.WithCancel(context.Background())
 	return &Reporter{
@@ -129,9 +129,10 @@ func (r *Reporter) serviceStatusReporter() {
 		copy := make(map[string]*models.SetDeviceServiceStatusRequest)
 		for service, status := range r.serviceStatuses {
 			reportedStatus, ok := r.reportedServiceStatuses[service]
-			if !ok || (reportedStatus.CurrentReleaseID != status.CurrentReleaseID ||
-				reportedStatus.ContainerStatus != status.ContainerStatus) {
-
+			if !ok ||
+				(reportedStatus.CurrentReleaseID != status.CurrentReleaseID ||
+					reportedStatus.ContainerStatus != status.ContainerStatus ||
+					reportedStatus.ContainerError != status.ContainerError) {
 				diff[service] = status
 			}
 			copy[service] = status
@@ -139,7 +140,14 @@ func (r *Reporter) serviceStatusReporter() {
 		r.lock.RUnlock()
 
 		for serviceName, status := range diff {
-			if err := r.reportServiceStatus(r.ctx, r.applicationID, serviceName, status.CurrentReleaseID, status.ContainerStatus); err != nil {
+			if err := r.reportServiceStatus(
+				r.ctx,
+				r.applicationID,
+				serviceName,
+				status.CurrentReleaseID,
+				status.ContainerStatus,
+				status.ContainerError,
+			); err != nil {
 				log.WithError(err).Error("report service status")
 				goto cont
 			}

@@ -196,22 +196,19 @@ type DeviceServiceStatus struct {
 	Service          string          `json:"service" yaml:"service"`
 	CurrentReleaseID string          `json:"currentReleaseId" yaml:"currentReleaseId"`
 	ContainerStatus  ContainerStatus `json:"containerStatus" yaml:"containerStatus"`
+	ContainerError   error           `json:"containerError" yaml:"containerError"`
 }
 
 type ContainerStatus string
 
 const (
-	ContainerDownloadingImage ContainerStatus = "Downloading"
 	ContainerUnknownStatus    ContainerStatus = "Unknown"
-
-	// Defined by the Docker API
-	ContainerCreated    ContainerStatus = "Created"
-	ContainerRestarting ContainerStatus = "Restarting"
-	ContainerRunning    ContainerStatus = "Running"
-	ContainerRemoving   ContainerStatus = "Removing"
-	ContainerPaused     ContainerStatus = "Paused"
-	ContainerExited     ContainerStatus = "Exited"
-	ContainerDead       ContainerStatus = "Dead"
+	ContainerPulling          ContainerStatus = "Pulling"
+	ContainerCreating         ContainerStatus = "Creating"
+	ContainerRemovingPrevious ContainerStatus = "Removing previous container"
+	ContainerStarting         ContainerStatus = "Starting"
+	ContainerRunning          ContainerStatus = "Running"
+	ContainerExited           ContainerStatus = "Exited"
 )
 
 type MembershipFull1 struct {

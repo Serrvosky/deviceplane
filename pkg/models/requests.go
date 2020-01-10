@@ -28,4 +28,5 @@ type SetDeviceApplicationStatusRequest struct {
 type SetDeviceServiceStatusRequest struct {
 	CurrentReleaseID string          `json:"currentReleaseId" validate:"id"`
 	ContainerStatus  ContainerStatus `json:"containerStatus"`
+	ContainerError   error           `json:"containerError"`
 }

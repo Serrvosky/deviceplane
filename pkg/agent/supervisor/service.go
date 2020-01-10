@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/deviceplane/deviceplane/pkg/spec"
+	"github.com/pkg/errors"
 
 	"github.com/apex/log"
 
@@ -143,21 +144,56 @@ func (s *ServiceSupervisor) reconcileLoop() {
 			}
 
 			startCanceler()
+			// pulling here
+			s.reporter.SetServiceStatus(s.serviceName, &models.SetDeviceServiceStatusRequest{
+				CurrentReleaseID: release,
+				ContainerStatus:  models.ContainerPulling,
+			})
 			if err = s.imagePuller.Pull(ctx, service.Image); err != nil {
+				s.reporter.SetServiceStatus(s.serviceName, &models.SetDeviceServiceStatusRequest{
+					CurrentReleaseID: release,
+					ContainerStatus:  models.ContainerPulling,
+					ContainerError:   errors.WithMessage(err, "pulling image"),
+				})
 				goto cont
 			}
 
 			s.sendKeepAliveDeactivate()
 
+			s.reporter.SetServiceStatus(s.serviceName, &models.SetDeviceServiceStatusRequest{
+				CurrentReleaseID: release,
+				ContainerStatus:  models.ContainerRemovingPrevious,
+			})
 			if err = utils.ContainerStop(ctx, s.engine, instance.ID); err != nil {
+				s.reporter.SetServiceStatus(s.serviceName, &models.SetDeviceServiceStatusRequest{
+					CurrentReleaseID: release,
+					ContainerStatus:  models.ContainerRemovingPrevious,
+					ContainerError:   errors.WithMessage(err, "stopping previous container"),
+				})
 				goto cont
 			}
 			if err = utils.ContainerRemove(ctx, s.engine, instance.ID); err != nil {
+				s.reporter.SetServiceStatus(s.serviceName, &models.SetDeviceServiceStatusRequest{
+					CurrentReleaseID: release,
+					ContainerStatus:  models.ContainerRemovingPrevious,
+					ContainerError:   errors.WithMessage(err, "removing previous container"),
+				})
 				goto cont
 			}
 		} else {
 			startCanceler()
-			s.imagePuller.Pull(ctx, service.Image)
+			s.reporter.SetServiceStatus(s.serviceName, &models.SetDeviceServiceStatusRequest{
+				CurrentReleaseID: release,
+				ContainerStatus:  models.ContainerPulling,
+			})
+			err := s.imagePuller.Pull(ctx, service.Image)
+			if err != nil {
+				s.reporter.SetServiceStatus(s.serviceName, &models.SetDeviceServiceStatusRequest{
+					CurrentReleaseID: release,
+					ContainerStatus:  models.ContainerPulling,
+					ContainerError:   errors.WithMessage(err, "pulling image"),
+				})
+			}
 		}
 
 		s.sendKeepAliveDeactivate()
@@ -173,14 +209,27 @@ func (s *ServiceSupervisor) reconcileLoop() {
 			}
 		}
 
+		s.reporter.SetServiceStatus(s.serviceName, &models.SetDeviceServiceStatusRequest{
+			CurrentReleaseID: release,
+			ContainerStatus:  models.ContainerCreating,
+		})
 		if _, err = utils.ContainerCreate(
 			ctx,
 			s.engine,
 			strings.Join([]string{s.serviceName, hash.ShortHash(s.applicationID), spec.ShortHash(service, s.serviceName)}, "-"),
 			spec.WithStandardLabels(service, s.applicationID, s.serviceName),
 		); err != nil {
+			s.reporter.SetServiceStatus(s.serviceName, &models.SetDeviceServiceStatusRequest{
+				CurrentReleaseID: release,
+				ContainerStatus:  models.ContainerCreating,
+				ContainerError:   errors.WithMessage(err, "creating container"),
+			})
 			goto cont
 		}
+		s.reporter.SetServiceStatus(s.serviceName, &models.SetDeviceServiceStatusRequest{
+			CurrentReleaseID: release,
+			ContainerStatus:  models.ContainerRunning,
+		})
 
 		s.sendKeepAliveService(service)
 		s.sendKeepAliveRelease(release)

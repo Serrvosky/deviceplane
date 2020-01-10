@@ -2168,7 +2168,7 @@ func (s *Store) scanDeviceApplicationStatus(scanner scanner) (*models.DeviceAppl
 	return &deviceApplicationStatus, nil
 }
 
-func (s *Store) SetDeviceServiceStatus(ctx context.Context, projectID, deviceID, applicationID, service, currentReleaseID string, containerStatus models.ContainerStatus) error {
+func (s *Store) SetDeviceServiceStatus(ctx context.Context, projectID, deviceID, applicationID, service, currentReleaseID string, containerStatus models.ContainerStatus, containerError error) error {
 	_, err := s.db.ExecContext(
 		ctx,
 		setDeviceServiceStatus,
@@ -2180,12 +2180,20 @@ func (s *Store) SetDeviceServiceStatus(ctx context.Context, projectID, deviceID,
 		containerStatus,
 		currentReleaseID,
 		containerStatus,
+		containerError,
 	)
 	return err
 }
 
 func (s *Store) GetDeviceServiceStatus(ctx context.Context, projectID, deviceID, applicationID, service string) (*models.DeviceServiceStatus, error) {
-	deviceServiceStatusRow := s.db.QueryRowContext(ctx, getDeviceServiceStatus, projectID, deviceID, applicationID, service)
+	deviceServiceStatusRow := s.db.QueryRowContext(
+		ctx,
+		getDeviceServiceStatus,
+		projectID,
+		deviceID,
+		applicationID,
+		service,
+	)
 
 	deviceServiceStatus, err := s.scanDeviceServiceStatus(deviceServiceStatusRow)
 	if err == sql.ErrNoRows {
@@ -2198,7 +2206,13 @@ func (s *Store) GetDeviceServiceStatus(ctx context.Context, projectID, deviceID,
 }
 
 func (s *Store) GetDeviceServiceStatuses(ctx context.Context, projectID, deviceID, applicationID string) ([]models.DeviceServiceStatus, error) {
-	deviceServiceStatusRows, err := s.db.QueryContext(ctx, getDeviceServiceStatuses, projectID, deviceID, applicationID)
+	deviceServiceStatusRows, err := s.db.QueryContext(
+		ctx,
+		getDeviceServiceStatuses,
+		projectID,
+		deviceID,
+		applicationID,
+	)
 	if err != nil {
 		return nil, errors.Wrap(err, "query device service statuses")
 	}
@@ -2264,6 +2278,7 @@ func (s *Store) scanDeviceServiceStatus(scanner scanner) (*models.DeviceServiceS
 		&deviceServiceStatus.Service,
 		&deviceServiceStatus.CurrentReleaseID,
 		&deviceServiceStatus.ContainerStatus,
+		&deviceServiceStatus.ContainerError,
 	); err != nil {
 		return nil, err
 	}

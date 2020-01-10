@@ -81,10 +81,11 @@ func NewAgent(
 				CurrentReleaseID: currentReleaseID,
 			})
 		},
-		func(ctx context.Context, applicationID, service string, currentReleaseID string, status models.ContainerStatus) error {
+		func(ctx context.Context, applicationID, service string, currentReleaseID string, status models.ContainerStatus, containerError error) error {
 			return client.SetDeviceServiceStatus(ctx, applicationID, service, models.SetDeviceServiceStatusRequest{
 				CurrentReleaseID: currentReleaseID,
 				ContainerStatus:  status,
+				ContainerError:   containerError,
 			})
 		},
 		[]validator.Validator{

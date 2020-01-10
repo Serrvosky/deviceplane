@@ -137,19 +137,19 @@ func convertToInstance(c types.Container) engine.Instance {
 		Status: (func() models.ContainerStatus {
 			switch c.State {
 			case "created":
-				return models.ContainerCreated
+				return models.ContainerStarting
 			case "restarting":
-				return models.ContainerRestarting
+				return models.ContainerExited
 			case "running":
 				return models.ContainerRunning
-			case "removing":
-				return models.ContainerRemoving
 			case "paused":
-				return models.ContainerPaused
+				return models.ContainerUnknownStatus
+			case "removing":
+				return models.ContainerExited
 			case "exited":
 				return models.ContainerExited
 			case "dead":
-				return models.ContainerDead
+				return models.ContainerExited
 			}
 			return models.ContainerUnknownStatus
 		})(),
