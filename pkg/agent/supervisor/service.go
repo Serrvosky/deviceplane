@@ -334,7 +334,7 @@ func (s *ServiceSupervisor) keepAlive() {
 							return "unknown error, cannot inspect container"
 						}
 						if inspectResponse.ExitCode != nil && (*inspectResponse.ExitCode) == 1 {
-							if inspectResponse.Error != "" {
+							if inspectResponse.Error == "" {
 								return "container exited with exit code 1"
 							}
 							return fmt.Sprintf("container exited with exit code 1 (error: %s)", inspectResponse.Error)

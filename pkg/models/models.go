@@ -196,7 +196,7 @@ type DeviceServiceStatus struct {
 	Service          string         `json:"service" yaml:"service"`
 	CurrentReleaseID string         `json:"currentReleaseId" yaml:"currentReleaseId"`
 	ContainerState   ContainerState `json:"containerState" yaml:"containerState"`
-	ContainerError   error          `json:"containerError" yaml:"containerError"`
+	ContainerError   string         `json:"containerError" yaml:"containerError"`
 }
 
 type ContainerState string
