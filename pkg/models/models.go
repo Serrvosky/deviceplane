@@ -190,25 +190,25 @@ type DeviceApplicationStatus struct {
 }
 
 type DeviceServiceStatus struct {
-	ProjectID        string          `json:"projectId" yaml:"projectId"`
-	DeviceID         string          `json:"deviceId" yaml:"deviceId"`
-	ApplicationID    string          `json:"applicationId" yaml:"applicationId"`
-	Service          string          `json:"service" yaml:"service"`
-	CurrentReleaseID string          `json:"currentReleaseId" yaml:"currentReleaseId"`
-	ContainerStatus  ContainerStatus `json:"containerStatus" yaml:"containerStatus"`
-	ContainerError   error           `json:"containerError" yaml:"containerError"`
+	ProjectID        string         `json:"projectId" yaml:"projectId"`
+	DeviceID         string         `json:"deviceId" yaml:"deviceId"`
+	ApplicationID    string         `json:"applicationId" yaml:"applicationId"`
+	Service          string         `json:"service" yaml:"service"`
+	CurrentReleaseID string         `json:"currentReleaseId" yaml:"currentReleaseId"`
+	ContainerState   ContainerState `json:"containerState" yaml:"containerState"`
+	ContainerError   error          `json:"containerError" yaml:"containerError"`
 }
 
-type ContainerStatus string
+type ContainerState string
 
 const (
-	ContainerUnknownStatus    ContainerStatus = "Unknown"
-	ContainerPulling          ContainerStatus = "Pulling"
-	ContainerCreating         ContainerStatus = "Creating"
-	ContainerRemovingPrevious ContainerStatus = "Removing previous container"
-	ContainerStarting         ContainerStatus = "Starting"
-	ContainerRunning          ContainerStatus = "Running"
-	ContainerExited           ContainerStatus = "Exited"
+	ContainerUnknownStatus    ContainerState = "Unknown"
+	ContainerPulling          ContainerState = "Pulling"
+	ContainerCreating         ContainerState = "Creating"
+	ContainerRemovingPrevious ContainerState = "Removing previous container"
+	ContainerStarting         ContainerState = "Starting"
+	ContainerRunning          ContainerState = "Running"
+	ContainerExited           ContainerState = "Exited"
 )
 
 type MembershipFull1 struct {

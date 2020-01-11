@@ -224,7 +224,7 @@ type DeviceApplicationStatuses interface {
 var ErrDeviceApplicationStatusNotFound = errors.New("device application status not found")
 
 type DeviceServiceStatuses interface {
-	SetDeviceServiceStatus(ctx context.Context, projectID, deviceID, applicationID, service, currentReleaseID string, containerStatus models.ContainerStatus, containerError error) error
+	SetDeviceServiceStatus(ctx context.Context, projectID, deviceID, applicationID, service, currentReleaseID string, containerState models.ContainerState, containerError error) error
 	GetDeviceServiceStatus(ctx context.Context, projectID, deviceID, applicationID, service string) (*models.DeviceServiceStatus, error)
 	GetDeviceServiceStatuses(ctx context.Context, projectID, deviceID, applicationID string) ([]models.DeviceServiceStatus, error)
 	ListDeviceServiceStatuses(ctx context.Context, projectID, deviceID string) ([]models.DeviceServiceStatus, error)

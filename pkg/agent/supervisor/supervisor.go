@@ -16,7 +16,7 @@ type Supervisor struct {
 	engine                  engine.Engine
 	variables               variables.Interface
 	reportApplicationStatus func(ctx context.Context, applicationID string, currentReleaseID string) error
-	reportServiceStatus     func(ctx context.Context, applicationID, service string, currentReleaseID string, status models.ContainerStatus, containerError error) error
+	reportServiceStatus     func(ctx context.Context, applicationID, service string, currentReleaseID string, state models.ContainerState, containerError error) error
 	validators              []validator.Validator
 
 	applicationIDs         map[string]struct{}
@@ -32,7 +32,7 @@ func NewSupervisor(
 	engine engine.Engine,
 	variables variables.Interface,
 	reportApplicationStatus func(ctx context.Context, applicationID, currentReleaseID string) error,
-	reportServiceStatus func(ctx context.Context, applicationID, service string, currentReleaseID string, status models.ContainerStatus, containerError error) error,
+	reportServiceStatus func(ctx context.Context, applicationID, service string, currentReleaseID string, state models.ContainerState, containerError error) error,
 	validators []validator.Validator,
 ) *Supervisor {
 	ctx, cancel := context.WithCancel(context.Background())

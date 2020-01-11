@@ -134,7 +134,8 @@ func convertToInstance(c types.Container) engine.Instance {
 	return engine.Instance{
 		ID:     c.ID,
 		Labels: c.Labels,
-		Status: (func() models.ContainerStatus {
+		Status: c.Status,
+		State: (func() models.ContainerState {
 			switch c.State {
 			case "created":
 				return models.ContainerStarting

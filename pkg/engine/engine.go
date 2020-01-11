@@ -26,7 +26,8 @@ type Engine interface {
 type Instance struct {
 	ID     string
 	Labels map[string]string
-	Status models.ContainerStatus
+	Status string
+	State  models.ContainerState
 }
 
 type InspectResponse struct {
