@@ -326,11 +326,22 @@ func (s *ServiceSupervisor) keepAlive() {
 
 			if instance.State != models.ContainerRunning {
 				inspectResponse, err := s.engine.InspectContainer(s.ctx, instance.ID)
+				fmt.Println("inspect response:", func() error {
+					if err != nil {
+						return errors.New("unknown error, cannot inspect container")
+					}
+					if err == nil {
+						if inspectResponse.ExitCode != nil && (*inspectResponse.ExitCode) == 1 {
+							return errors.Errorf("container exited with exit code 1 (error: %s)", inspectResponse.Error)
+						}
+					}
+					return nil
+				}())
+
 				s.reporter.SetServiceStatus(s.serviceName, &models.SetDeviceServiceStatusRequest{
 					CurrentReleaseID: release,
 					ContainerState:   instance.State,
 					ContainerError: func() error {
-						fmt.Printf("inspect response %+v\n", inspectResponse)
 						if err != nil {
 							return errors.New("unknown error, cannot inspect container")
 						}
