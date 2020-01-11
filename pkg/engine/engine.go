@@ -31,5 +31,7 @@ type Instance struct {
 }
 
 type InspectResponse struct {
-	PID int
+	PID      int
+	ExitCode *int
+	Error    string
 }
