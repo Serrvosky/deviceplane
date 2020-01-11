@@ -330,7 +330,7 @@ func (s *ServiceSupervisor) keepAlive() {
 					CurrentReleaseID: release,
 					ContainerState:   instance.State,
 					ContainerError: func() error {
-						fmt.Println(inspectResponse)
+						fmt.Printf("inspect response %+v\n", inspectResponse)
 						if err != nil {
 							return errors.New("unknown error, cannot inspect container")
 						}
