@@ -154,7 +154,7 @@ func (s *ServiceSupervisor) reconcileLoop() {
 				s.reporter.SetServiceStatus(s.serviceName, &models.SetDeviceServiceStatusRequest{
 					CurrentReleaseID: release,
 					ContainerState:   models.ContainerPulling,
-					ContainerError:   errors.WithMessage(err, "pulling image"),
+					ContainerError:   errors.WithMessage(err, "pulling image").Error(),
 				})
 				goto cont
 			}
@@ -169,7 +169,7 @@ func (s *ServiceSupervisor) reconcileLoop() {
 				s.reporter.SetServiceStatus(s.serviceName, &models.SetDeviceServiceStatusRequest{
 					CurrentReleaseID: release,
 					ContainerState:   models.ContainerRemovingPrevious,
-					ContainerError:   errors.WithMessage(err, "stopping previous container"),
+					ContainerError:   errors.WithMessage(err, "stopping previous container").Error(),
 				})
 				goto cont
 			}
@@ -177,7 +177,7 @@ func (s *ServiceSupervisor) reconcileLoop() {
 				s.reporter.SetServiceStatus(s.serviceName, &models.SetDeviceServiceStatusRequest{
 					CurrentReleaseID: release,
 					ContainerState:   models.ContainerRemovingPrevious,
-					ContainerError:   errors.WithMessage(err, "removing previous container"),
+					ContainerError:   errors.WithMessage(err, "removing previous container").Error(),
 				})
 				goto cont
 			}
@@ -192,7 +192,7 @@ func (s *ServiceSupervisor) reconcileLoop() {
 				s.reporter.SetServiceStatus(s.serviceName, &models.SetDeviceServiceStatusRequest{
 					CurrentReleaseID: release,
 					ContainerState:   models.ContainerPulling,
-					ContainerError:   errors.WithMessage(err, "pulling image"),
+					ContainerError:   errors.WithMessage(err, "pulling image").Error(),
 				})
 			}
 		}
@@ -223,7 +223,7 @@ func (s *ServiceSupervisor) reconcileLoop() {
 			s.reporter.SetServiceStatus(s.serviceName, &models.SetDeviceServiceStatusRequest{
 				CurrentReleaseID: release,
 				ContainerState:   models.ContainerCreating,
-				ContainerError:   errors.WithMessage(err, "creating container"),
+				ContainerError:   errors.WithMessage(err, "creating container").Error(),
 			})
 			goto cont
 		}
@@ -326,31 +326,20 @@ func (s *ServiceSupervisor) keepAlive() {
 
 			if instance.State != models.ContainerRunning {
 				inspectResponse, err := s.engine.InspectContainer(s.ctx, instance.ID)
-				fmt.Println("inspect response:", func() error {
-					if err != nil {
-						return errors.New("unknown error, cannot inspect container")
-					}
-					if err == nil {
-						if inspectResponse.ExitCode != nil && (*inspectResponse.ExitCode) == 1 {
-							return errors.Errorf("container exited with exit code 1 (error: %s)", inspectResponse.Error)
-						}
-					}
-					return nil
-				}())
-
 				s.reporter.SetServiceStatus(s.serviceName, &models.SetDeviceServiceStatusRequest{
 					CurrentReleaseID: release,
 					ContainerState:   instance.State,
-					ContainerError: func() error {
+					ContainerError: func() string {
 						if err != nil {
-							return errors.New("unknown error, cannot inspect container")
+							return "unknown error, cannot inspect container"
 						}
-						if err == nil {
-							if inspectResponse.ExitCode != nil && (*inspectResponse.ExitCode) == 1 {
-								return errors.Errorf("container exited with exit code 1 (error: %s)", inspectResponse.Error)
+						if inspectResponse.ExitCode != nil && (*inspectResponse.ExitCode) == 1 {
+							if inspectResponse.Error != "" {
+								return "container exited with exit code 1"
 							}
+							return fmt.Sprintf("container exited with exit code 1 (error: %s)", inspectResponse.Error)
 						}
-						return nil
+						return ""
 					}(),
 				})
 

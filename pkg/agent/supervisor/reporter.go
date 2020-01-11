@@ -12,7 +12,7 @@ import (
 type Reporter struct {
 	applicationID           string
 	reportApplicationStatus func(ctx context.Context, applicationID string, currentRelease string) error
-	reportServiceStatus     func(ctx context.Context, applicationID, service string, currentReleaseID string, state models.ContainerState, containerError error) error
+	reportServiceStatus     func(ctx context.Context, applicationID, service string, currentReleaseID string, state models.ContainerState, containerError string) error
 
 	desiredApplicationRelease      string
 	desiredApplicationServiceNames map[string]struct{}
@@ -32,7 +32,7 @@ type Reporter struct {
 func NewReporter(
 	applicationID string,
 	reportApplicationStatus func(ctx context.Context, applicationID, currentRelease string) error,
-	reportServiceStatus func(ctx context.Context, applicationID, service string, currentReleaseID string, state models.ContainerState, containerError error) error,
+	reportServiceStatus func(ctx context.Context, applicationID, service string, currentReleaseID string, state models.ContainerState, containerError string) error,
 ) *Reporter {
 	ctx, cancel := context.WithCancel(context.Background())
 	return &Reporter{

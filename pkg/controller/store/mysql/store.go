@@ -2168,13 +2168,8 @@ func (s *Store) scanDeviceApplicationStatus(scanner scanner) (*models.DeviceAppl
 	return &deviceApplicationStatus, nil
 }
 
-func (s *Store) SetDeviceServiceStatus(ctx context.Context, projectID, deviceID, applicationID, service, currentReleaseID string, containerState models.ContainerState, containerError error) error {
-	containerErrorBytes, err := json.Marshal(containerError)
-	if err != nil {
-		return err
-	}
-
-	_, err = s.db.ExecContext(
+func (s *Store) SetDeviceServiceStatus(ctx context.Context, projectID, deviceID, applicationID, service, currentReleaseID string, containerState models.ContainerState, containerError string) error {
+	_, err := s.db.ExecContext(
 		ctx,
 		setDeviceServiceStatus,
 		projectID,
@@ -2183,11 +2178,11 @@ func (s *Store) SetDeviceServiceStatus(ctx context.Context, projectID, deviceID,
 		service,
 		currentReleaseID,
 		containerState,
-		containerErrorBytes,
+		containerError,
 
 		currentReleaseID,
 		containerState,
-		containerErrorBytes,
+		containerError,
 	)
 	return err
 }
@@ -2277,7 +2272,6 @@ func (s *Store) DeleteDeviceServiceStatus(ctx context.Context, projectID, device
 }
 
 func (s *Store) scanDeviceServiceStatus(scanner scanner) (*models.DeviceServiceStatus, error) {
-	var containerErrorStr string
 	var deviceServiceStatus models.DeviceServiceStatus
 	if err := scanner.Scan(
 		&deviceServiceStatus.ProjectID,
@@ -2286,13 +2280,8 @@ func (s *Store) scanDeviceServiceStatus(scanner scanner) (*models.DeviceServiceS
 		&deviceServiceStatus.Service,
 		&deviceServiceStatus.CurrentReleaseID,
 		&deviceServiceStatus.ContainerState,
-		&containerErrorStr,
+		&deviceServiceStatus.ContainerError,
 	); err != nil {
-		return nil, err
-	}
-
-	err := json.Unmarshal([]byte(containerErrorStr), &deviceServiceStatus.ContainerError)
-	if err != nil {
 		return nil, err
 	}
 

@@ -81,7 +81,7 @@ func NewAgent(
 				CurrentReleaseID: currentReleaseID,
 			})
 		},
-		func(ctx context.Context, applicationID, service string, currentReleaseID string, state models.ContainerState, containerError error) error {
+		func(ctx context.Context, applicationID, service string, currentReleaseID string, state models.ContainerState, containerError string) error {
 			fmt.Printf("entire post %+v\n", models.SetDeviceServiceStatusRequest{
 				CurrentReleaseID: currentReleaseID,
 				ContainerState:   state,
