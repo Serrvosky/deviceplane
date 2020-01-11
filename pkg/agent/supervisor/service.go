@@ -325,20 +325,20 @@ func (s *ServiceSupervisor) keepAlive() {
 			}
 
 			if instance.State != models.ContainerRunning {
-				if err = utils.ContainerStart(s.ctx, s.engine, instance.ID); err != nil {
-					s.reporter.SetServiceStatus(s.serviceName, &models.SetDeviceServiceStatusRequest{
-						CurrentReleaseID: release,
-						ContainerState:   instance.State,
-						ContainerError: func() error {
-							fmt.Println("STATUS IS", instance.Status)
-							if strings.Contains(instance.Status, "Exit 1") {
-								return errors.WithMessagef(err, "container exited with %s", instance.Status)
-							}
-							return nil
-						}(),
-					})
-					continue
-				}
+				s.reporter.SetServiceStatus(s.serviceName, &models.SetDeviceServiceStatusRequest{
+					CurrentReleaseID: release,
+					ContainerState:   instance.State,
+					ContainerError: func() error {
+						fmt.Println("STATUS IS", instance.Status)
+						if strings.Contains(instance.Status, "Exit 1") {
+							return errors.Errorf("container exited with %s", instance.Status)
+						}
+						return nil
+					}(),
+				})
+
+				utils.ContainerStart(s.ctx, s.engine, instance.ID)
+				continue
 			}
 
 			s.reporter.SetServiceStatus(s.serviceName, &models.SetDeviceServiceStatusRequest{
