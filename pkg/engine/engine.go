@@ -27,7 +27,7 @@ type Instance struct {
 	ID     string
 	Labels map[string]string
 	Status string
-	State  models.ContainerState
+	State  models.ServiceState
 }
 
 type InspectResponse struct {

@@ -12,7 +12,7 @@ import (
 type Reporter struct {
 	applicationID           string
 	reportApplicationStatus func(ctx context.Context, applicationID string, currentRelease string) error
-	reportServiceStatus     func(ctx context.Context, applicationID, service string, currentReleaseID string, state models.ContainerState, containerError string) error
+	reportServiceStatus     func(ctx context.Context, applicationID, service string, currentReleaseID string, state models.ServiceState, containerError string) error
 
 	desiredApplicationRelease      string
 	desiredApplicationServiceNames map[string]struct{}
@@ -32,7 +32,7 @@ type Reporter struct {
 func NewReporter(
 	applicationID string,
 	reportApplicationStatus func(ctx context.Context, applicationID, currentRelease string) error,
-	reportServiceStatus func(ctx context.Context, applicationID, service string, currentReleaseID string, state models.ContainerState, containerError string) error,
+	reportServiceStatus func(ctx context.Context, applicationID, service string, currentReleaseID string, state models.ServiceState, containerError string) error,
 ) *Reporter {
 	ctx, cancel := context.WithCancel(context.Background())
 	return &Reporter{
@@ -131,7 +131,7 @@ func (r *Reporter) serviceStatusReporter() {
 			reportedStatus, ok := r.reportedServiceStatuses[service]
 			if !ok ||
 				(reportedStatus.CurrentReleaseID != status.CurrentReleaseID ||
-					reportedStatus.ContainerState != status.ContainerState ||
+					reportedStatus.CurrentState != status.CurrentState ||
 					reportedStatus.ContainerError != status.ContainerError) {
 				diff[service] = status
 			}
@@ -145,7 +145,7 @@ func (r *Reporter) serviceStatusReporter() {
 				r.applicationID,
 				serviceName,
 				status.CurrentReleaseID,
-				status.ContainerState,
+				status.CurrentState,
 				status.ContainerError,
 			); err != nil {
 				log.WithError(err).Error("report service status")

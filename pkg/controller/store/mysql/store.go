@@ -2168,7 +2168,7 @@ func (s *Store) scanDeviceApplicationStatus(scanner scanner) (*models.DeviceAppl
 	return &deviceApplicationStatus, nil
 }
 
-func (s *Store) SetDeviceServiceStatus(ctx context.Context, projectID, deviceID, applicationID, service, currentReleaseID string, containerState models.ContainerState, containerError string) error {
+func (s *Store) SetDeviceServiceStatus(ctx context.Context, projectID, deviceID, applicationID, service, currentReleaseID string, state models.ServiceState, errorMessage string) error {
 	_, err := s.db.ExecContext(
 		ctx,
 		setDeviceServiceStatus,
@@ -2177,12 +2177,12 @@ func (s *Store) SetDeviceServiceStatus(ctx context.Context, projectID, deviceID,
 		applicationID,
 		service,
 		currentReleaseID,
-		containerState,
-		containerError,
+		state,
+		errorMessage,
 
 		currentReleaseID,
-		containerState,
-		containerError,
+		state,
+		errorMessage,
 	)
 	return err
 }
@@ -2279,8 +2279,8 @@ func (s *Store) scanDeviceServiceStatus(scanner scanner) (*models.DeviceServiceS
 		&deviceServiceStatus.ApplicationID,
 		&deviceServiceStatus.Service,
 		&deviceServiceStatus.CurrentReleaseID,
-		&deviceServiceStatus.ContainerState,
-		&deviceServiceStatus.ContainerError,
+		&deviceServiceStatus.CurrentState,
+		&deviceServiceStatus.ErrorMessage,
 	); err != nil {
 		return nil, err
 	}

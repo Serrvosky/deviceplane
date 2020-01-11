@@ -190,25 +190,25 @@ type DeviceApplicationStatus struct {
 }
 
 type DeviceServiceStatus struct {
-	ProjectID        string         `json:"projectId" yaml:"projectId"`
-	DeviceID         string         `json:"deviceId" yaml:"deviceId"`
-	ApplicationID    string         `json:"applicationId" yaml:"applicationId"`
-	Service          string         `json:"service" yaml:"service"`
-	CurrentReleaseID string         `json:"currentReleaseId" yaml:"currentReleaseId"`
-	ContainerState   ContainerState `json:"containerState" yaml:"containerState"`
-	ContainerError   string         `json:"containerError" yaml:"containerError"`
+	ProjectID        string       `json:"projectId" yaml:"projectId"`
+	DeviceID         string       `json:"deviceId" yaml:"deviceId"`
+	ApplicationID    string       `json:"applicationId" yaml:"applicationId"`
+	Service          string       `json:"service" yaml:"service"`
+	CurrentReleaseID string       `json:"currentReleaseId" yaml:"currentReleaseId"`
+	CurrentState     ServiceState `json:"currentState" yaml:"currentState"`
+	ErrorMessage     string       `json:"errorMessage" yaml:"errorMessage"`
 }
 
-type ContainerState string
+type ServiceState string
 
 const (
-	ContainerUnknownStatus    ContainerState = "Unknown"
-	ContainerPulling          ContainerState = "Pulling"
-	ContainerCreating         ContainerState = "Creating"
-	ContainerRemovingPrevious ContainerState = "Removing previous container"
-	ContainerStarting         ContainerState = "Starting"
-	ContainerRunning          ContainerState = "Running"
-	ContainerExited           ContainerState = "Exited"
+	ServiceUnknownStatus             ServiceState = "Unknown"
+	ServiceImagePulling              ServiceState = "Pulling"
+	ServiceContainerCreating         ServiceState = "Creating"
+	ServiceRemovingPreviousContainer ServiceState = "Removing previous container"
+	ServiceContainerStarting         ServiceState = "Starting"
+	ServiceContainerRunning          ServiceState = "Running"
+	ServiceContainerExited           ServiceState = "Exited"
 )
 
 type MembershipFull1 struct {

@@ -135,24 +135,24 @@ func convertToInstance(c types.Container) engine.Instance {
 		ID:     c.ID,
 		Labels: c.Labels,
 		Status: c.Status,
-		State: (func() models.ContainerState {
+		State: (func() models.ServiceState {
 			switch c.State {
 			case "created":
-				return models.ContainerStarting
+				return models.ServiceContainerStarting
 			case "restarting":
-				return models.ContainerExited
+				return models.ServiceContainerExited
 			case "running":
-				return models.ContainerRunning
+				return models.ServiceContainerRunning
 			case "paused":
-				return models.ContainerUnknownStatus
+				return models.ServiceUnknownStatus
 			case "removing":
-				return models.ContainerExited
+				return models.ServiceContainerExited
 			case "exited":
-				return models.ContainerExited
+				return models.ServiceContainerExited
 			case "dead":
-				return models.ContainerExited
+				return models.ServiceContainerExited
 			}
-			return models.ContainerUnknownStatus
+			return models.ServiceUnknownStatus
 		})(),
 	}
 }
