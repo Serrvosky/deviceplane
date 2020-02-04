@@ -254,8 +254,12 @@ type Bundle struct {
 	Applications        []FullBundledApplication  `json:"applications" yaml:"applications"`
 	ApplicationStatuses []DeviceApplicationStatus `json:"applicationStatuses" yaml:"applicationStatuses"`
 	ServiceStatuses     []DeviceServiceStatus     `json:"serviceStatuses" yaml:"serviceStatuses"`
-	DesiredAgentSpec    string                    `json:"desiredAgentSpec" yaml:"desiredAgentSpec"`
-	DesiredAgentVersion string                    `json:"desiredAgentVersion" yaml:"desiredAgentVersion"`
+
+	DesiredAgentSpec    string `json:"desiredAgentSpec" yaml:"desiredAgentSpec"`
+	DesiredAgentVersion string `json:"desiredAgentVersion" yaml:"desiredAgentVersion"`
+
+	ServiceMetricsConfigs []ServiceMetricsConfig `json:"serviceMetricsConfig" yaml:"serviceMetricsConfig"`
+	DeviceMetricsConfig   DeviceMetricsConfig    `json:"deviceMetricsConfig" yaml:"deviceMetricsConfig"`
 }
 
 type BundledApplication struct {
