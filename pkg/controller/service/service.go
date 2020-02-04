@@ -2879,9 +2879,26 @@ func (s *Service) getBundle(w http.ResponseWriter, r *http.Request, project mode
 		return
 	}
 
+	deviceMetricsConfig, err := s.metricConfigs.GetDeviceMetricsConfig(r.Context(), project.ID)
+	if err != nil {
+		log.WithError(err).Error("get device metrics config")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	serviceMetricsConfigs, err := s.metricConfigs.GetServiceMetricsConfigs(r.Context(), project.ID)
+	if err != nil {
+		log.WithError(err).Error("get device metrics config")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	bundle := models.Bundle{
 		DesiredAgentSpec:    device.DesiredAgentSpec,
 		DesiredAgentVersion: device.DesiredAgentVersion,
+
+		DeviceMetricsConfig:   deviceMetricsConfig,
+		ServiceMetricsConfigs: serviceMetricsConfigs,
 	}
 
 	for _, application := range applications {
